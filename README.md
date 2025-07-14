@@ -93,8 +93,7 @@ This document contains customized notes from solved labs on [PortSwigger Web Sec
 - **Fix**: Normalize and validate paths, enforce whitelisting.
 
 ---
-
-## 🔓 Access Control
+## 🔓 Access Control Vulnerabilities Labs
 
 ### Unprotected Admin Functionality
 - **Bug**: No auth check on admin pages.
@@ -102,17 +101,77 @@ This document contains customized notes from solved labs on [PortSwigger Web Sec
 - **Exploit**: Accessed `/admin` without login.
 - **Fix**: Enforce role-based access on all sensitive routes.
 
-### Unprotected Admin Functionality with Obscure URL
-- **Bug**: Relied on obscurity instead of security.
-- **Why**: Endpoint wasn’t protected.
-- **Exploit**: Guessed or found `/admin-secret` URL.
-- **Fix**: Always require access control checks, not just obscurity.
+### Unprotected Admin Functionality with Unpredictable URL
+- **Bug**: Relied on security through obscurity.
+- **Why**: Endpoint wasn’t protected properly.
+- **Exploit**: Guessed or found hidden admin URLs.
+- **Fix**: Apply proper authentication and authorization checks.
 
-### User Role Controlled by Parameter
-- **Bug**: Role was client-controlled (`role=admin`).
-- **Why**: Trusted user input for roles.
-- **Exploit**: Changed request to elevate privilege.
-- **Fix**: Manage and verify roles server-side only.
+### User Role Controlled by Request Parameter
+- **Bug**: Role value controlled by client input.
+- **Why**: Server trusted user-supplied role parameters.
+- **Exploit**: Modified role parameter to escalate privileges.
+- **Fix**: Roles must be assigned and verified server-side only.
+
+### User Role Can Be Modified in User Profile
+- **Bug**: User can change their own role in profile settings.
+- **Why**: Role data is modifiable by the user.
+- **Exploit**: Elevated own privileges by editing role.
+- **Fix**: Roles should not be editable by users.
+
+### User ID Controlled by Request Parameter
+- **Bug**: User ID sent in request to fetch or modify data.
+- **Why**: No access control on user IDs.
+- **Exploit**: Changed user ID to access/modify other accounts.
+- **Fix**: Enforce strict access control per user ID.
+
+### User ID Controlled by Request Parameter, with Unpredictable User IDs
+- **Bug**: IDs are hard to guess but no auth checks.
+- **Why**: Security through obscurity only.
+- **Exploit**: Brute forced or enumerated IDs to access data.
+- **Fix**: Enforce proper access control regardless of ID complexity.
+
+### User ID Controlled by Request Parameter with Data Leakage in Redirect
+- **Bug**: Sensitive data exposed in redirects using user IDs.
+- **Why**: Redirect URLs leak info.
+- **Exploit**: Captured sensitive data via redirects.
+- **Fix**: Avoid leaking sensitive info in URLs or redirects.
+
+### User ID Controlled by Request Parameter with Password Disclosure
+- **Bug**: Access to other users’ passwords by modifying user ID.
+- **Why**: Missing or insufficient access controls.
+- **Exploit**: Retrieved passwords by changing user ID in request.
+- **Fix**: Secure all sensitive endpoints with proper auth.
+
+### Insecure Direct Object References (IDOR)
+- **Bug**: Direct references to objects without authorization.
+- **Why**: Server fails to verify user permissions.
+- **Exploit**: Accessed unauthorized data by changing object IDs.
+- **Fix**: Implement strict authorization checks on all object references.
+
+### URL-based Access Control Can Be Circumvented
+- **Bug**: Access control enforced by URL patterns.
+- **Why**: URL manipulation or rewriting bypasses controls.
+- **Exploit**: Altered URLs to access restricted functions.
+- **Fix**: Apply robust access control independent of URLs.
+
+### Method-based Access Control Can Be Circumvented
+- **Bug**: Access control depends on HTTP method (e.g., POST only).
+- **Why**: Server fails to check all methods properly.
+- **Exploit**: Used alternative HTTP methods (GET, PUT) to bypass.
+- **Fix**: Validate access rights for all HTTP methods.
+
+### Multi-step Process with No Access Control on One Step
+- **Bug**: One step in multi-step workflow lacks access control.
+- **Why**: Server trusts user has completed prior steps.
+- **Exploit**: Skipped steps and accessed unprotected step directly.
+- **Fix**: Check access control on every step independently.
+
+### Referer-based Access Control
+- **Bug**: Access control based on Referer HTTP header.
+- **Why**: Referer can be spoofed or controlled by attacker.
+- **Exploit**: Forged Referer header to bypass restrictions.
+- **Fix**: Do not rely on Referer for critical access decisions.
 
 ---
 
